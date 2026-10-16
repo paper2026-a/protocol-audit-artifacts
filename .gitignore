@@ -1,0 +1,27 @@
+# Exclude large/private and credential-bearing material
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.*
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.bin
+rclone.conf
+credentials.json
+client_secret*.json
+*.pem
+*.key
+*.p12
+*.tar.gz
+.DS_Store
+adapters/
+checkpoints/
+models/
+outputs/
+
+# Locally recomputed JSONs retain absolute input paths; never commit them.
+recomputed/
