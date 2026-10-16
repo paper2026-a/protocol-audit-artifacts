@@ -1,43 +1,50 @@
-# SignCV — protocol-aware structural compatibility audit
+# SignCV — Protocol-Aware Structural Compatibility Audit
 
-Artifacts for anonymous review of coordinate-level sign-consensus measurements across multiple LoRA objectives.
+Anonymous research artifacts for the four-run structural analysis of coordinate-level sign consensus across multiple LoRA objectives. All released files are located at the **repository root**.
 
-## Contents
+## Files
 
-- `scripts/signcv_recheck_safe.py`: structural measurement and reference-normalization pipeline.
-- `scripts/signcv_selftest.py`: numerical checks and synthetic tests.
-- `scripts/verify_release.py`: consistency checks for the released result summaries.
-- `scripts/rerun_4run.sh`: CPU rerun command using separately obtained adapter weights.
-- `results/*_4run.json`: per-model results, including 27-state sign histograms and input manifests.
-- `results/table_4run.csv`: summary of the four-run structural measurements.
+- `signcv_recheck_safe.py` — sign-consensus measurements, protocol-matched reference values, and 27-state histograms.
+- `signcv_selftest.py` — numerical checks and synthetic tests of the counting rules.
+- `verify_release.py` — consistency checks for the four released result files.
+- `rerun_4run.sh` — CPU rerun wrapper (requires separately obtained adapter weights).
+- `llama2_4run.json`, `qwen_4run.json`, `llama3_4run.json`, `mistral_4run.json` — per-model four-run results and input manifests.
+- `table_4run.csv` — summary table.
+- `FILE_CHECKSUMS.sha256` — SHA256 checksums for the files in this repository.
 
-## Check results
+## Verify the released results
 
-Requires Python 3.9+:
+With Python 3.9 or later, from the repository root:
 
 ```bash
-python3 scripts/verify_release.py
+python3 verify_release.py llama2_4run.json qwen_4run.json llama3_4run.json mistral_4run.json
 ```
 
-Optional numerical tests:
+Check the released file hashes (on Linux/macOS):
+
+```bash
+sha256sum -c FILE_CHECKSUMS.sha256
+```
+
+Optional numerical unit and synthetic-data tests:
 
 ```bash
 python3 -m pip install -r requirements.txt
-python3 scripts/signcv_selftest.py --recheck scripts/signcv_recheck_safe.py
+python3 signcv_selftest.py --recheck ./signcv_recheck_safe.py
 ```
 
-## Rerun the structural audit
+## Rerun the four-run structural analysis
 
-For each model, place 12 LoRA adapter folders under a common root: three objectives (`race`, `gender`, `ses`), two learning rates (`0.0001`, `0.0002`), and seeds `42` and `43`. Each folder contains `adapter_model.safetensors` and `adapter_config.json`.
+Obtain the original LoRA adapter weights separately. Each model requires 12 adapter directories: `race`, `gender`, and `ses`, each at learning rates `0.0001` and `0.0002`, and seeds `42` and `43`. Every directory must contain `adapter_model.safetensors` and `adapter_config.json`.
 
 ```bash
-bash scripts/rerun_4run.sh qwen /path/to/ffinal_qwen
-bash scripts/rerun_4run.sh llama3 /path/to/ffinal_llama
-bash scripts/rerun_4run.sh mistral /path/to/ffinal
+bash rerun_4run.sh qwen /path/to/ffinal_qwen
+bash rerun_4run.sh llama3 /path/to/ffinal_llama
+bash rerun_4run.sh mistral /path/to/ffinal
 ```
 
-The four-run within-objective rule is 3-of-4. Cross-objective results are reported for 2-of-3 and 3-of-3 rules, each with its own analytic independence reference. The input-weight SHA256 records for Qwen2.5, Llama-3, and Mistral are included in their JSON manifests.
+The four-run within-objective voting rule is 3-of-4. Cross-objective results are reported for 2-of-3 majority and 3-of-3 unanimity with corresponding, protocol-matched independence references. The JSON input manifests include weight SHA256 records for Qwen2.5, Llama-3, and Mistral.
 
-## Provenance and scope
+## Reproducibility scope
 
-The result summaries and per-tensor histograms are unchanged apart from anonymizing machine-specific input paths. The release supports independent verification of the four-run **structural calculations**; raw adapter weights, eight-run inputs/results, training pipelines, and downstream behavioral evaluation are not included. The historical Llama-2 four-run recheck used fallback LoRA configuration values because the original adapter configuration files were unavailable; its raw input identity has not been independently established.
+The released JSON files include structural counts and per-tensor histograms for verifying the reported **four-run structural calculations**. Adapter weights, eight-run inputs/results, training pipelines, and downstream behavioral evaluation are not part of this release. The historical Llama-2 four-run recheck used fallback LoRA configuration values because the original adapter configuration files were unavailable; original weight identity for that run has not been independently authenticated.

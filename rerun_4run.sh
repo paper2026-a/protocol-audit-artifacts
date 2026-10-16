@@ -9,5 +9,5 @@ case "$model" in qwen|llama3|mistral|llama2) ;; *) echo "Invalid model" >&2; exi
 export CUDA_VISIBLE_DEVICES="" OMP_NUM_THREADS=2 MKL_NUM_THREADS=2
 out="recomputed/${model}_4run.json"
 mkdir -p recomputed
-python3 scripts/signcv_recheck_safe.py --root "$root" --seeds 42 43 --device cpu --within-agg l2mean --hash-inputs --out "$out"
-python3 scripts/verify_release.py --allow-absolute-paths "$out"
+python3 signcv_recheck_safe.py --root "$root" --seeds 42 43 --device cpu --within-agg l2mean --hash-inputs --out "$out"
+python3 verify_release.py --allow-absolute-paths "$out"
